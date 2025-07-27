@@ -1,0 +1,15 @@
+Application Based on
+- load Balancer
+- Request is logged to cloudWatch
+- Error triggers alarm + sedn email
+- DevOps dashboard shows traffic & latency spike
+- update config via ci/cd -> rollout monitored safely
+
+
+Project
+|
+|----- main.tf
+|
+|----- variables.tf
+|
+|----- userdata.sh
