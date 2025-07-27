@@ -4,18 +4,26 @@ provider "aws" {
 
 # 1. VPC and Subnets
 resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-  enable_dns_support = true
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
   enable_dns_hostnames = true
   tags = { Name = "main-vpc" }
 }
 
 resource "aws_subnet" "subnet1" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "${var.region}a"
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "${var.region}a"
   map_public_ip_on_launch = true
   tags = { Name = "subnet1" }
+}
+
+resource "aws_subnet" "subnet2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "${var.region}b"
+  map_public_ip_on_launch = true
+  tags = { Name = "subnet2" }
 }
 
 resource "aws_internet_gateway" "gw" {
@@ -31,19 +39,31 @@ resource "aws_route_table" "rt" {
   }
 }
 
-resource "aws_route_table_association" "rta" {
+resource "aws_route_table_association" "rta1" {
   subnet_id      = aws_subnet.subnet1.id
+  route_table_id = aws_route_table.rt.id
+}
+
+resource "aws_route_table_association" "rta2" {
+  subnet_id      = aws_subnet.subnet2.id
   route_table_id = aws_route_table.rt.id
 }
 
 # 2. Security Group
 resource "aws_security_group" "web_sg" {
-  name        = "web-sg"
-  vpc_id      = aws_vpc.main.id
+  name   = "web-sg"
+  vpc_id = aws_vpc.main.id
 
   ingress {
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -58,15 +78,16 @@ resource "aws_security_group" "web_sg" {
   tags = { Name = "web-sg" }
 }
 
+# 3. EC2 Key Pair
 resource "aws_key_pair" "my_key" {
   key_name   = "imported-key"
   public_key = file("/mnt/c/Users/NEW/.ssh/id_rsa.pub")
 }
 
-# 3. Launch Template
+# 4. Launch Template
 resource "aws_launch_template" "web_template" {
   name_prefix   = "web-template-"
-  image_id      = "ami-0d0ad8bb301edb745" # Amazon Linux 2
+  image_id      = "ami-0d0ad8bb301edb745" # Amazon Linux 2 for ap-south-1
   instance_type = var.instance_type
   key_name      = aws_key_pair.my_key.key_name
 
@@ -85,13 +106,13 @@ resource "aws_launch_template" "web_template" {
   )
 }
 
-# 4. Application Load Balancer
+# 5. Application Load Balancer
 resource "aws_lb" "app_alb" {
   name               = "app-lb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.web_sg.id]
-  subnets            = [aws_subnet.subnet1.id]
+  subnets            = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
 }
 
 resource "aws_lb_target_group" "tg" {
@@ -121,19 +142,21 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
-# 5. Auto Scaling Group
+# 6. Auto Scaling Group
 resource "aws_autoscaling_group" "asg" {
   name                      = "web-asg"
   max_size                  = 2
   min_size                  = 1
   desired_capacity          = 1
-  vpc_zone_identifier       = [aws_subnet.subnet1.id]
+  vpc_zone_identifier       = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
   health_check_type         = "EC2"
   force_delete              = true
+
   launch_template {
     id      = aws_launch_template.web_template.id
     version = "$Latest"
   }
+
   target_group_arns = [aws_lb_target_group.tg.arn]
 
   tag {
@@ -143,7 +166,7 @@ resource "aws_autoscaling_group" "asg" {
   }
 }
 
-# 6. CloudWatch Alarm + SNS
+# 7. CloudWatch Alarm + SNS
 resource "aws_sns_topic" "cpu_alerts" {
   name = "cpu-alert-topic"
 }
@@ -151,7 +174,7 @@ resource "aws_sns_topic" "cpu_alerts" {
 resource "aws_sns_topic_subscription" "email_target" {
   topic_arn = aws_sns_topic.cpu_alerts.arn
   protocol  = "email"
-  endpoint  = "youremail@email.com"
+  endpoint  = var.email_address
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
