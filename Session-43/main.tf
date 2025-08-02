@@ -58,7 +58,7 @@ resource "aws_key_pair" "my_key" {
 }
 
 resource "aws_instance" "web" {
-    ami = "ami-08a6efd148b1f7504"
+    ami = "ami-020cba7c55df1f615"
     instance_type = "t3.micro"
     subnet_id = aws_subnet.subnet1.id
     vpc_security_group_ids = [aws_security_group.web_sg.id]
@@ -67,13 +67,14 @@ resource "aws_instance" "web" {
     tags = {
         Name="WebServer"
     }
-    user_data = <<-EOF
-                #!/bin/bash
-                yum install -y httpd
-                systemctl enable httpd
-                systemctl start httpd
-                echo "<h1> Deployed in US EAST-1a</h1>" > /var/www/html/index.html
-                EOF
+     user_data = <<-EOF
+              #!/bin/bash
+              sudo apt update
+              sudo apt install apache2 -y
+              sudo syatemctl start apache2
+              sudo syatemctl start apache2
+              echo "<html><body><h1>✅ Deployed Static HTML Page via Terraform</h1></body></html>" > /var/www/html/index.html
+              EOF
 }
 
 #--Auto Scaling
