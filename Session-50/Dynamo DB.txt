@@ -1,0 +1,6 @@
+aws dynamodb create-table --table-name Employee --attribute-definitions AttributeName=UserId,AttributeType=S --key-schema AttributeName=UserId,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --region us-east-1
+
+
+
+//give DynamoDB Full Access to your AWS Root User
+//AmazonDynamoDBFullAccess
