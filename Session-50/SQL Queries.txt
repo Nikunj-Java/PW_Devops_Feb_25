@@ -1,0 +1,23 @@
+1. to check Available databases
+> show databases;
+
+2. create new database
+> create database <name_of _database>
+
+3. to use database
+> use <database_name>
+
+4. to create table in database
+> create table users(id int auto_increment primary key,name varchar(50));
+
+5. get the available tables
+> show tables;
+
+6. get the description of table
+> describe <name_of_table>
+
+7. insert data into table
+> insert into users(name) values('Nikunj Soni');
+
+8. to get all users
+> select * from users;
