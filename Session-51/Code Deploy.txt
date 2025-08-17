@@ -1,0 +1,44 @@
+
+Step:1 Create Amazon Linux (Free Tier) Instance With Role(select role from advance security or create the new role) and create the instance
+
+Step:2 Goto> iam role> select the role and attach new policy: AmazonS3ReadOnlyAccess
+
+Step:3 Connect local machine using aws cli using ssh
+
+Step:4
+
+> sudo dnf update -y
+> sudo dnf install -y ruby wget
+
+//set the region
+> REGION=ap-south-1
+> wget https://aws-codedeploy-$REGION.s3.$REGION.amazonaws.com/latest/install
+> chmod +x ./install
+> sudo ./install auto
+
+#enable & start agent
+> sudo systemctl enable codedeploy-agent
+> sudo systemctl start codedeploy-agent
+> sudo systemctl status codedeploy-agent
+
+
+Step:5
+
+Create IAM Role for CodeDeploy
+CodeDeploy needs a role so it can copy files from S3 and run on EC2.
+
+> Go to IAM → Roles → Create role
+
+>Trusted entity: CodeDeploy
+
+>Attach managed policy: AWSCodeDeployRole
+
+>Name it: CodeDeployServiceRole
+
+> Tag your EC2 instance
+
+> Go to EC2 → Instances → select your instance → Tags
+> Add:
+  Key = Env
+
+  Value = Dev
