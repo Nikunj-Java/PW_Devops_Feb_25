@@ -42,3 +42,23 @@ CodeDeploy needs a role so it can copy files from S3 and run on EC2.
   Key = Env
 
   Value = Dev
+
+
+
+
+Step:6
+> cd myapp
+> zip -r ../app-v1.zip .
+> cd ..
+> aws s3 mb s3://my-codedeploy-demo-bucket --region ap-south-1
+> aws s3 cp app-v1.zip s3://my-codedeploy-demo-bucket/
+
+
+
+
+Step:7
+
+Create Deployment 
+> aws deploy get-deployment-group --application-name MyWebApp --deployment-group-name MyWebAppDG --region ap-south-1
+> aws deploy create-deployment --application-name MyWebApp --deployment-group-name MyWebAppDG --s3-location bucket=my-codedeploy-demo-bucket170825,key=app-v1.zip,bundleType=zip --region ap-south-1
+> aws deploy get-deployment --deployment-id <deployment id> --region ap-south-1
