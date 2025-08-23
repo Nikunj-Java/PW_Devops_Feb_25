@@ -1,0 +1,38 @@
+AWS EKS (Elastic Kubernetes Service)
+
+**************Check the version of ekctl & if not installed install it******************
+EKSCTL Installation
+--------------------
+# for ARM systems, set ARCH to: `arm64`, `armv6` or `armv7`
+ARCH=amd64
+PLATFORM=$(uname -s)_$ARCH
+
+curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+
+# (Optional) Verify checksum
+curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
+
+tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+
+sudo install -m 0755 /tmp/eksctl /usr/local/bin && rm /tmp/eksctl
+--------------------------------------------------------------------
+> eksctl version
+
+**************Setup a Cluster***********************************************************
+eksctl create cluster --name dev-cluster --region us-east-1 --nodegroup-name dev-nodes --node-type t3.medium --nodes 2 --nodes-min 2 --nodes-max 5 --managed
+
+--name: Name of your cluster
+--region: AWS region (us-east-1)
+--node-type: ec2 Instance type
+--node: No.of instance in node group
+--managed: managed node groups
+
+
+*********** Update Kubeconfig ****************
+so we can talk to our cluster
+
+aws eks --region us-east-1 update-kubeconfig --name dev-cluster
+
+*********** Test your cluster *****************
+kubectl get nodes
+kubectl get svc 
