@@ -73,7 +73,7 @@ kubectl logs deployment/nginx
 
 NOTE: Once Everything Done Make sure to close it.
 
--- kubectl delte service nginx
+-- kubectl delete service nginx
 -- kubectl delete deployment nginx
 -- eksctl delete cluster --name dev-cluster --region us-east-1
 
@@ -86,3 +86,28 @@ NOTE: Once Everything Done Make sure to close it.
 -- kubectl delete deployment/nginx
 
 ******************** SCALE Pods Dynamically ***********************
+- kubectl autoscale deployment nginx --cpu-percent=50 --min=2 --max=10
+
+*** Genrate Load to use cpu
+- kubectl run load-generator --image=busybox  -- /bin/sh -c "while true; do wget -q -O- http://nginx; done"
+
+you can check cpu load:
+- kubectl get hpa
+
+to increase the Load :
+    kubectl run load-generator1 --image=busybox  -- /bin/sh -c "while true; do wget -q -O- http://nginx; done"
+    kubectl run load-generator2 --image=busybox  -- /bin/sh -c "while true; do wget -q -O- http://nginx; done"
+    kubectl run load-generator3 --image=busybox  -- /bin/sh -c "while true; do wget -q -O- http://nginx; done"
+
+
+just check cpu utilization if it cross 50% you can check 
+- kubectl get pods
+
+(you can see extra pods created --scaling)
+
+delete the load-generator pods and then try again to check the sacling down
+
+-  kubectl delete pod load-generator
+-  kubectl delete pod load-generator1
+-  kubectl delete pod load-generator2
+-  kubectl delete pod load-generator3
