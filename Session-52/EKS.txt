@@ -111,3 +111,15 @@ delete the load-generator pods and then try again to check the sacling down
 -  kubectl delete pod load-generator1
 -  kubectl delete pod load-generator2
 -  kubectl delete pod load-generator3
+
+-------------------------------------------------------------------------
+Deplot Cluster using deployment.yml file
+
+deployment.yml file is already available
+
+- kubectl apply -f deployment.yml
+
+check:
+- kubectl get deployment
+- kubectl get pods
+- kubectl get svc
