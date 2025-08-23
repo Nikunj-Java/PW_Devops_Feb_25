@@ -1,4 +1,16 @@
 AWS EKS (Elastic Kubernetes Service)
+******************** I am USER Permission****************************
+1. AdministratorAccess
+2. AmazonEC2ContainerRegistryFullAccess
+3. AmazonEC2FullAccess
+4. AmazonEKSClusterPolicy
+5. AmazonEKSServicePolicy
+6. AmazonEKSWorkerNodePolicy
+7. CloudWatchLogsFullAccess
+8. ElasticLoadBalancingFullAccess
+9. IAMFullAccess
+10.IAMUserChangePassword
+
 
 **************Check the version of ekctl & if not installed install it******************
 EKSCTL Installation
