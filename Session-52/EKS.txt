@@ -76,3 +76,13 @@ NOTE: Once Everything Done Make sure to close it.
 -- kubectl delte service nginx
 -- kubectl delete deployment nginx
 -- eksctl delete cluster --name dev-cluster --region us-east-1
+
+********************* How Pods Distributed among nodes *****************************
+
+-- kubectl create deployment nginx --replicas=4
+-- kubectl get pods -o wide
+(you can see different pods assigned with different nodes)
+
+-- kubectl delete deployment/nginx
+
+******************** SCALE Pods Dynamically ***********************
