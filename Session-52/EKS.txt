@@ -15,7 +15,7 @@ AWS EKS (Elastic Kubernetes Service)
 **************Check the version of ekctl & if not installed install it******************
 EKSCTL Installation
 --------------------
-# for ARM systems, set ARCH to: `arm64`, `armv6` or `armv7`
+
 ARCH=amd64
 PLATFORM=$(uname -s)_$ARCH
 
@@ -48,3 +48,31 @@ aws eks --region us-east-1 update-kubeconfig --name dev-cluster
 *********** Test your cluster *****************
 kubectl get nodes
 kubectl get svc 
+
+*********** Deploy a Test Application *********
+
+kubectl create deployment nginx --image=nginx
+
+kubectl expose deployment nginx --port=80 --type=LoadBalancer
+
+kubectl get svc
+
+(it will take time to get the load balancer external IP)
+you can see th LoadBalancer DNS there
+
+Loo like this:
+a13fd6aa35cf44d55a019b123fe8a082-253251484.us-east-1.elb.amazonaws.com
+
+(this will provide default nginx page)
+
+you can check the default deployment logs 
+
+
+kubectl logs deployment/nginx
+
+
+NOTE: Once Everything Done Make sure to close it.
+
+-- kubectl delte service nginx
+-- kubectl delete deployment nginx
+-- eksctl delete cluster --name dev-cluster --region us-east-1
